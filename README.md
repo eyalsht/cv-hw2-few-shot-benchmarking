@@ -5,7 +5,7 @@
 ### Benchmarking DINOv2 · CLIP · ConvNeXt across 3 classifier heads, 2 domains, and 4 shot settings
 
 <p>
-  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/PyTorch-2.6%20%2B%20CUDA%2012.4-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" />
   <img src="https://img.shields.io/badge/%F0%9F%A4%97%20Transformers-5.x-FFD21E?style=flat-square" />
   <img src="https://img.shields.io/badge/scikit--learn-1.9-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" />
@@ -14,7 +14,7 @@
 <p>
   <img src="https://img.shields.io/badge/experiments-72-22d3ee?style=flat-square" />
   <img src="https://img.shields.io/badge/episodes%20%2F%20config-10%2C000-f472b6?style=flat-square" />
-  <img src="https://img.shields.io/badge/GPU-RTX%204070%20Super-a3e635?style=flat-square&logo=nvidia&logoColor=white" />
+  <img src="https://img.shields.io/badge/GPU-RTX%203080%20Ti-a3e635?style=flat-square&logo=nvidia&logoColor=white" />
 </p>
 
 <br/>
@@ -30,8 +30,9 @@
 How well do **frozen** pre-trained vision backbones generalize to brand-new classes from just a
 handful of labeled examples? This project answers that empirically. It runs a complete few-shot
 benchmark — **3 backbones × 3 classifier heads × 2 datasets × 4 shot settings = 72 configurations**,
-each averaged over **10,000 randomly sampled 5-way episodes** (`seed = 42`) — then adds a custom
-**CLIP-Adapter** and tests whether a lightweight learned adapter can beat the classics.
+each averaged over **10,000 randomly sampled 5-way episodes** (`seed = 42`). For Task 5 it then tries
+three ways to beat those baselines: per-episode **λ-tuned Ridge**, a richer **Mahalanobis** head, and a
+learned **CLIP-Adapter**.
 
 <table>
 <tr><td>
@@ -57,7 +58,7 @@ satellite imagery — a deliberate domain shift). **Episodes:** 5-way, K ∈ {1,
 
 ## 🔑 Key findings
 
-> **1. Ridge Regression is the strongest head** — almost everywhere, and its lead *grows* with K.
+> **1. Ridge Regression is the strongest of the three baseline heads** — almost everywhere, and its lead *grows* with K.
 > A well-regularized closed-form solver beats both the information-discarding Prototypical mean and
 > the overfit-prone gradient-descent Linear probe in this small-data regime.
 
@@ -65,8 +66,9 @@ satellite imagery — a deliberate domain shift). **Episodes:** 5-way, K ∈ {1,
 > Stanford Cars but is the **worst** backbone on satellite EuroSAT — pretraining distribution matters
 > more than architecture for surviving domain shift. (This is the flip you see in the animation above.)
 
-> **3. More parameters ≠ better few-shot.** A from-scratch per-episode CLIP-Adapter does **not** beat
-> Ridge — an honest negative result: here the bottleneck is *data*, not model capacity.
+> **3. A richer closed-form head beats the baselines; a learned one doesn't.** Our shrinkage
+> **Mahalanobis** head beats the best baseline on Stanford Cars at K≥2, while per-episode λ-tuning and a
+> from-scratch CLIP-Adapter do not improve on the baselines. The bottleneck here is *data*, not model capacity.
 
 #### Best accuracy per backbone (Ridge head, 16-shot)
 
@@ -89,15 +91,17 @@ Section 1 — Feature Extraction        Section 2 — Benchmarking
 ```
 
 The 10,000-episode sweep is **vectorized across episodes** (a batched `(B, D, C)` solve instead of a
-Python loop) — a ~50× speedup, verified bit-identical to the reference per-episode heads. The whole
-benchmark runs in ~30–40 min on one GPU.
+Python loop) — a ~50× speedup, verified bit-identical to the reference per-episode heads. The
+full benchmark sweep (144 configs × 10,000 episodes) takes about 95 min on one GPU, most of it the
+per-episode adapter; the closed-form heads finish well under a minute each.
 
 ## Repo layout
 
 ```
 cv_hw2_312359284_314884834.ipynb   self-contained, executed report (all results embedded)
 benchmark_results.csv               72 baseline configs (mean / std accuracy)
-adapter_results.csv                 24 CLIP-Adapter configs
+improved_results.csv                48 LOO-Ridge + Mahalanobis configs (Task 5)
+adapter_results.csv                 24 CLIP-Adapter configs (Task 5)
 make_hero_gif.py                    regenerates the animation above from the CSV
 assets/scaling.gif                  hero animation
 ```
@@ -109,8 +113,8 @@ notebook regenerates them on first run.
 
 ```bash
 pip install torch transformers datasets git+https://github.com/openai/CLIP.git \
-            scikit-learn matplotlib seaborn pandas tqdm
-jupyter nbconvert --to notebook --execute --inplace cv_hw2_312359284_314884834.ipynb
+            scikit-learn matplotlib seaborn pandas tqdm jupyter nbconvert ipykernel
+python -m nbconvert --to notebook --execute --inplace cv_hw2_312359284_314884834.ipynb
 ```
 
 A restart-and-run-all reuses any cached `.pt`/`.csv` artifacts and just re-renders the analysis;
