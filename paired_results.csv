@@ -1,0 +1,4 @@
+dataset,backbone,k,A,B,meanA,meanB,wilcoxon_p
+cars,clip,16,ridge,proto,0.6263381242752075,0.6014823317527771,0.0
+cars,clip,16,mahalanobis,ridge,0.7328913807868958,0.6263381242752075,0.0
+cars,clip,16,mahalanobis,proto,0.7328913807868958,0.6014823317527771,0.0
