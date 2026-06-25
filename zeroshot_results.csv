@@ -1,0 +1,3 @@
+dataset,backbone,method,C,mean
+cars,clip,zeroshot_text,196,0.5389558232931727
+eurosat,clip,zeroshot_text,10,0.4148148148148148
