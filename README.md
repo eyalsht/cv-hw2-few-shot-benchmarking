@@ -5,7 +5,7 @@
 ### Benchmarking DINOv2 · CLIP · ConvNeXt across 3 classifier heads, 2 domains, and 4 shot settings
 
 <p>
-  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/PyTorch-2.6%20%2B%20CUDA%2012.4-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" />
   <img src="https://img.shields.io/badge/%F0%9F%A4%97%20Transformers-5.x-FFD21E?style=flat-square" />
   <img src="https://img.shields.io/badge/scikit--learn-1.9-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" />
@@ -14,7 +14,7 @@
 <p>
   <img src="https://img.shields.io/badge/experiments-72-22d3ee?style=flat-square" />
   <img src="https://img.shields.io/badge/setting-full%20C--way%20(196%20%2F%2010)-f472b6?style=flat-square" />
-  <img src="https://img.shields.io/badge/GPU-RTX%203080%20Ti-a3e635?style=flat-square&logo=nvidia&logoColor=white" />
+  <img src="https://img.shields.io/badge/GPU-RTX%204070%20SUPER-a3e635?style=flat-square&logo=nvidia&logoColor=white" />
 </p>
 
 <br/>
