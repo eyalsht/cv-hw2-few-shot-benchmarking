@@ -54,7 +54,7 @@ per-episode **λ-tuned Ridge**, a richer **Mahalanobis** head, and a small-N **C
 
 **Datasets:** Stanford Cars (196 fine-grained classes, natural images) · EuroSAT (10 classes,
 satellite imagery — a deliberate domain shift). **Episodes:** full C-way (196-way Cars / 10-way
-EuroSAT), K ∈ {1, 2, 4, 16} shots, 15 queries/class (Cars 2,000 episodes, EuroSAT 10,000).
+EuroSAT), K ∈ {1, 2, 4, 16} shots, 15 queries/class (10,000 episodes per configuration).
 
 ## 🔑 Key findings
 
@@ -89,15 +89,16 @@ Section 1 — Feature Extraction        Section 2 — Benchmarking
 │ images → frozen backbone  │   .pt   │ sample C-way K-shot episode        │
 │ → cache embeddings to disk│ ──────▶ │ → fit head on support              │
 │   (6 cache files, ~350 MB)│         │ → score 15 queries/class           │
-└───────────────────────────┘         │ → mean over 2k–10k episodes        │
+└───────────────────────────┘         │ → mean over 10,000 episodes        │
                                        └────────────────────────────────────┘
 ```
 
-The sweep is **vectorized across episodes** (a batched solve instead of a Python loop), verified
-bit-identical to the reference per-episode heads, with memory-aware batching for the ~40× larger
-196-way episodes. The full C-way regeneration (main benchmark + Task-5 closed-form + the N-way sweep +
-extras) takes roughly **1–1.5 h** on one GPU, dominated by the 196-way Cars runs; re-rendering the
-analysis from the cached results is about a minute.
+The sweep is **vectorized across episodes** — both the episode sampler (one bulk gather instead of
+per-class indexing) and the heads (a batched solve instead of a Python loop) — verified bit-identical
+to the reference per-episode versions, with memory-aware batching for the ~40× larger 196-way episodes.
+The full C-way regeneration at 10,000 episodes per configuration (main benchmark + Task-5 closed-form +
+the N-way sweep + extras) takes roughly **1–1.5 h** on one GPU, dominated by the 196-way Linear-probe
+configs; re-rendering the analysis from the cached results is about a minute.
 
 ## Repo layout
 
